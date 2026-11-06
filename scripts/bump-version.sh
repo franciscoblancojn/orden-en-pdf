@@ -33,7 +33,7 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH"
 
 if git rev-parse -q --verify "refs/tags/$NEW_VERSION" > /dev/null; then
     echo "✗ El tag $NEW_VERSION ya existe"
-    # exit 1
+    exit 1
 fi
 
 # Se comprueba antes de tocar nada: no se publica una versión sin notas en el changelog.
