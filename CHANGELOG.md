@@ -4,7 +4,7 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
-## [Sin publicar]
+## [1.0.0] - 2026-11-06
 
 ### ✨ Añadido
 - 📄 **Descarga del pedido en PDF** desde el detalle del pedido en el admin, con un botón en la caja «Orden en PDF» (compatible con el almacenamiento clásico y con HPOS).
