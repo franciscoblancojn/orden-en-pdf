@@ -1,0 +1,56 @@
+/* Orden en PDF — admin. Prefijo oep- (las clases fwue- son de wordpress_utils). */
+.oep-page .oep-version {
+	font-size: 13px;
+	font-weight: 400;
+	color: #646970;
+}
+
+.oep-page .tab-content {
+	display: none;
+}
+
+.oep-page .tab-content.nav-tab-active {
+	display: block;
+}
+
+.oep-page .fwue-message {
+	max-width: 900px;
+}
+
+.oep-logo {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.oep-logo__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 180px;
+	min-height: 72px;
+	padding: 10px;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.oep-logo__img {
+	max-width: 220px;
+	max-height: 90px;
+	width: auto;
+	height: auto;
+}
+
+.oep-logo__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	padding-top: 6px;
+}
+
+.oep-muted {
+	color: #646970;
+}

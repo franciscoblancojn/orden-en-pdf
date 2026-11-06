@@ -1,0 +1,13 @@
+{
+    "require": {
+        "php": ">=7.4",
+        "dompdf/dompdf": "^2.0",
+        "franciscoblancojn/wordpress_utils": "^1"
+    },
+    "config": {
+        "autoloader-suffix": "OEP",
+        "platform": {
+            "php": "7.4.33"
+        }
+    }
+}

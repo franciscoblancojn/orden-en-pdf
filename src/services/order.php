@@ -1,0 +1,302 @@
+<?php
+
+/**
+ * Datos de un pedido listos para la plantilla del PDF.
+ *
+ * Todo se devuelve como texto plano (sin HTML de WooCommerce), para poder escaparlo
+ * una sola vez en la plantilla.
+ */
+class OEP_ORDER
+{
+    /**
+     * @param int $order_id
+     * @return WC_Order|null
+     */
+    public static function get($order_id)
+    {
+        if (!function_exists('wc_get_order')) {
+            return null;
+        }
+        $order = wc_get_order(absint($order_id));
+
+        return $order instanceof WC_Order ? $order : null;
+    }
+
+    /**
+     * Último pedido de la tienda (para la vista previa de los ajustes).
+     *
+     * @return WC_Order|null
+     */
+    public static function latest()
+    {
+        if (!function_exists('wc_get_orders')) {
+            return null;
+        }
+        $orders = wc_get_orders([
+            'limit' => 1,
+            'orderby' => 'date',
+            'order' => 'DESC',
+            'return' => 'objects',
+        ]);
+        if (!$orders) {
+            return null;
+        }
+        $order = reset($orders);
+
+        return $order instanceof WC_Order ? $order : null;
+    }
+
+    /**
+     * Quita etiquetas y entidades del HTML que devuelve WooCommerce.
+     */
+    public static function plain($html)
+    {
+        $text = html_entity_decode(wp_strip_all_tags((string) $html), ENT_QUOTES, 'UTF-8');
+
+        return trim(str_replace("\xC2\xA0", ' ', $text));
+    }
+
+    /**
+     * Precio con el formato de la tienda, sin HTML.
+     *
+     * @param float         $amount
+     * @param WC_Order|null $order
+     */
+    public static function money($amount, $order = null)
+    {
+        $args = [];
+        if ($order instanceof WC_Order) {
+            $args['currency'] = $order->get_currency();
+        }
+
+        return self::plain(wc_price($amount, $args));
+    }
+
+    /**
+     * @param WC_Order $order
+     */
+    public static function date($order)
+    {
+        $date = $order->get_date_created();
+        if (!$date) {
+            return '';
+        }
+
+        return self::plain(wc_format_datetime($date));
+    }
+
+    /**
+     * @param WC_Order $order
+     */
+    public static function status($order)
+    {
+        return self::plain(wc_get_order_status_name($order->get_status()));
+    }
+
+    /**
+     * @param WC_Order $order
+     */
+    public static function payment($order)
+    {
+        $title = $order->get_payment_method_title();
+        if ('' === $title) {
+            $title = $order->get_payment_method();
+        }
+
+        return self::plain($title);
+    }
+
+    /**
+     * Métodos de envío del pedido, separados por coma.
+     *
+     * @param WC_Order $order
+     */
+    public static function shipping_method($order)
+    {
+        $methods = [];
+        foreach ($order->get_shipping_methods() as $method) {
+            $name = self::plain($method->get_name());
+            if ('' !== $name) {
+                $methods[] = $name;
+            }
+        }
+
+        return implode(', ', array_unique($methods));
+    }
+
+    /**
+     * Dirección de facturación o de envío.
+     *
+     * @param WC_Order $order
+     * @param string   $type billing|shipping
+     */
+    public static function address($order, $type)
+    {
+        $is_billing = 'billing' === $type;
+        $get = function ($field) use ($order, $type) {
+            return (string) $order->{'get_' . $type . '_' . $field}();
+        };
+
+        $name = $is_billing ? $order->get_formatted_billing_full_name() : $order->get_formatted_shipping_full_name();
+        $country_code = $get('country');
+        $countries = [];
+        if (function_exists('WC') && WC() && isset(WC()->countries) && WC()->countries) {
+            $countries = WC()->countries->get_countries();
+        }
+        $country = isset($countries[$country_code]) ? $countries[$country_code] : $country_code;
+
+        $lines = [];
+        $company = self::plain($get('company'));
+        if ('' !== $company) {
+            $lines[] = $company;
+        }
+        $address = trim(self::plain($get('address_1') . ' ' . $get('address_2')));
+        if ('' !== $address) {
+            $lines[] = $address;
+        }
+        $city = trim(implode(' ', array_filter([
+            self::plain($get('city')),
+            self::plain($get('state')),
+            self::plain($get('postcode')),
+        ])));
+        if ('' !== $city) {
+            $lines[] = $city;
+        }
+        $country = self::plain($country);
+        if ('' !== $country) {
+            $lines[] = $country;
+        }
+
+        return [
+            'name' => self::plain($name),
+            'company' => $company,
+            'lines' => $lines,
+            'email' => $is_billing ? self::plain($get('email')) : '',
+            'phone' => $is_billing ? self::plain($get('phone')) : '',
+        ];
+    }
+
+    /**
+     * @param WC_Order $order
+     */
+    public static function items($order)
+    {
+        $items = [];
+
+        foreach ($order->get_items() as $item) {
+            $qty = (int) $item->get_quantity();
+            $subtotal = (float) $order->get_line_subtotal($item, false, true);
+            $unit = $qty > 0 ? $subtotal / $qty : $subtotal;
+
+            $meta = [];
+            foreach ($item->get_formatted_meta_data('_') as $meta_item) {
+                $label = self::plain($meta_item->display_key);
+                $value = self::plain($meta_item->display_value);
+                if ('' !== $label && '' !== $value) {
+                    $meta[] = $label . ': ' . $value;
+                }
+            }
+
+            $sku = '';
+            $product = $item->get_product();
+            if ($product) {
+                $sku = (string) $product->get_sku();
+            }
+
+            $items[] = [
+                'name' => self::plain($item->get_name()),
+                'sku' => self::plain($sku),
+                'qty' => $qty,
+                'unit' => self::money($unit, $order),
+                'total' => self::money($subtotal, $order),
+                'meta' => $meta,
+            ];
+        }
+
+        return $items;
+    }
+
+    /**
+     * Filas de totales propias de WooCommerce (subtotal, descuento, envío, impuestos, total…).
+     *
+     * @param WC_Order $order
+     */
+    public static function totals($order)
+    {
+        $rows = [];
+
+        foreach ($order->get_order_item_totals() as $key => $row) {
+            // El método de pago ya se muestra en «Datos del pedido».
+            if ('payment_method' === $key) {
+                continue;
+            }
+            $rows[] = [
+                'key' => $key,
+                'label' => self::plain($row['label'] ?? ''),
+                'value' => self::plain($row['value'] ?? ''),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Notas del pedido (internas y visibles para el cliente).
+     *
+     * @param WC_Order $order
+     */
+    public static function notes($order)
+    {
+        if (!function_exists('wc_get_order_notes')) {
+            return [];
+        }
+        // Se piden las 50 más recientes y se muestran en orden cronológico.
+        $notes = wc_get_order_notes([
+            'order_id' => $order->get_id(),
+            'orderby' => 'date_created',
+            'order' => 'DESC',
+            'limit' => 50,
+        ]);
+        $notes = is_array($notes) ? array_reverse($notes) : [];
+        $out = [];
+
+        foreach ($notes as $note) {
+            $out[] = [
+                'date' => self::plain(wc_format_datetime($note->date_created)),
+                'content' => self::plain($note->content),
+                'customer' => !empty($note->customer_note),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Todos los datos que usa la plantilla.
+     *
+     * @param WC_Order $order
+     */
+    public static function data($order)
+    {
+        $billing = self::address($order, 'billing');
+        $shipping = self::address($order, 'shipping');
+
+        return [
+            'id' => $order->get_id(),
+            'number' => (string) $order->get_order_number(),
+            'date' => self::date($order),
+            'status' => self::status($order),
+            'payment' => self::payment($order),
+            'transaction' => self::plain($order->get_transaction_id()),
+            'shipping_method' => self::shipping_method($order),
+            'customer_id' => (int) $order->get_customer_id(),
+            'customer_note' => self::plain($order->get_customer_note()),
+            'billing' => $billing,
+            'shipping' => $shipping,
+            'has_shipping' => (bool) $order->has_shipping_address(),
+            'items' => self::items($order),
+            'totals' => self::totals($order),
+            'notes' => self::notes($order),
+        ];
+    }
+}
