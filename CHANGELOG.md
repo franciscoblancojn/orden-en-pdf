@@ -4,7 +4,7 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
-## [Sin publicar]
+## [1.0.1] - 2026-11-06
 
 ### 🐛 Corregido
 - 😀 **Emojis en el PDF**: la cabecera, la nota del cliente, las notas del pedido y el pie ahora muestran los emojis reales (`🏭`, `📩`, `☎️`, `🏠`, `🏘️`, `🏙️`, `🌎`, `🏢`…) en lugar de glifos rotos o cuadros. Se incluye `assets/fonts/OEPEmoji.ttf`, una versión de Noto Emoji remapeada al área de uso privado porque DOMPDF no maneja caracteres fuera del plano básico, y el servicio `OEP_EMOJI` los convierte y dibuja. Si la fuente no se puede registrar, los emojis se omiten sin romper el documento.
