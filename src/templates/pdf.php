@@ -295,6 +295,9 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
                 <div class="box">
                     <div class="box__title">Facturación</div>
                     <div class="box__name"><?= esc_html('' !== $billing['name'] ? $billing['name'] : '—') ?></div>
+                    <?php if ('' !== $data['document']['value']) : ?>
+                        <p><?php if ('' !== $data['document']['label']) : ?><strong><?= esc_html($data['document']['label']) ?>:</strong> <?php endif; ?><?= esc_html($data['document']['value']) ?></p>
+                    <?php endif; ?>
                     <?php foreach ($billing['lines'] as $line) : ?>
                         <p><?= esc_html($line) ?></p>
                     <?php endforeach; ?>

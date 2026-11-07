@@ -24,7 +24,7 @@ El PDF se genera en el momento: no se guardan copias de los pedidos en el servid
 
 - Logo del sitio (o el logo elegido en los ajustes) y datos de cabecera.
 - Número, fecha, estado, método de pago, transacción y método de envío.
-- Cliente y direcciones de facturación y envío (email y teléfono en facturación).
+- Cliente y direcciones de facturación y envío (documento del cliente, email y teléfono en facturación). El departamento sale con su nombre (ANT → Antioquia).
 - Productos: miniatura del producto o de la variación, nombre, SKU, variaciones, cantidad, precio unitario y total.
 - Totales de WooCommerce: subtotal, descuento, envío, impuestos, total y devoluciones.
 - Nota del cliente (opcional) e historial de notas del pedido (opcional).
@@ -39,6 +39,7 @@ El PDF se genera en el momento: no se guardan copias de los pedidos en el servid
 
 - **Logo:** si no se elige uno, se usa el logo del tema (**Personalizar → Identidad del sitio**). Si tampoco hay, se muestra el nombre del sitio en texto. El logo se incrusta como data URI: DOMPDF no necesita acceder a archivos ni a internet.
 - **Ancho del logo**, nombre de la empresa, datos de cabecera (NIT, dirección, teléfono…), título del documento, pie de página, tamaño de papel (A4 o Carta) y color de acento.
+- **Documento del cliente:** etiqueta (por defecto «Cédula») y campos del pedido donde buscarlo, uno por línea. Por defecto `_billing_id`, `billing_id`, `_cedula` y `cedula`: el campo `billing_id` de facturación y el campo `cedula` que agregan algunos plugins de envío. Si el cliente lo escribió en varios, se muestran los valores distintos separados por « / » (el mismo número con puntos o espacios cuenta una vez).
 - **Contenido:** nota del cliente e historial de notas.
 - **Vista previa:** abre el PDF del último pedido con los ajustes guardados.
 

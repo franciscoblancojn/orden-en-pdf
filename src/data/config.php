@@ -22,6 +22,13 @@ class OEP_USE_DATA_CONFIG extends OEP_USE_DATA_BASE
         'document_title' => 'Pedido',
         'paper' => 'a4',
         'accent_color' => '#1f2933',
+        // Documento del cliente (cédula, NIT…): se muestra en la caja de Facturación.
+        'document_label' => 'Cédula',
+        // Metadatos del pedido donde puede estar, en orden (uno por línea). Se muestran todos los
+        // valores distintos que tengan: el cliente puede haberlo escrito en uno u otro campo.
+        //   _billing_id / billing_id: campo "billing_id" de facturación (WooCommerce o un editor de campos).
+        //   _cedula / cedula: campo "cedula" que agregan algunos plugins de envío.
+        'document_fields' => "_billing_id\nbilling_id\n_cedula\ncedula",
         // Contenido.
         'show_customer_note' => 1,
         'show_notes' => 0,
@@ -79,6 +86,27 @@ class OEP_USE_DATA_CONFIG extends OEP_USE_DATA_BASE
     }
 
     /**
+     * Lista de metadatos del documento, uno por línea. Solo letras, números, _ - / y .; los demás se descartan
+     * (los campos adicionales del checkout por bloques se guardan como _wc_other/plugin/campo).
+     *
+     * @param string $value
+     * @return string[]
+     */
+    public static function document_fields($value)
+    {
+        $keys = [];
+        foreach (preg_split('/[\r\n,]+/', (string) $value) as $key) {
+            $key = trim($key);
+            // Nombres con otros caracteres se descartan (no se "limpian": podrían coincidir con otro campo).
+            if (preg_match('/^[A-Za-z0-9_\-\/.]+$/', $key) && !in_array($key, $keys, true)) {
+                $keys[] = $key;
+            }
+        }
+
+        return array_slice($keys, 0, 20);
+    }
+
+    /**
      * Normaliza lo que llega del formulario de ajustes.
      */
     public static function sanitize($input)
@@ -118,6 +146,8 @@ class OEP_USE_DATA_CONFIG extends OEP_USE_DATA_BASE
             'document_title' => $text('document_title'),
             'paper' => $paper,
             'accent_color' => $accent ? $accent : $d['accent_color'],
+            'document_label' => sanitize_text_field($input['document_label'] ?? ''),
+            'document_fields' => implode("\n", self::document_fields($input['document_fields'] ?? '')),
             'show_customer_note' => $check('show_customer_note'),
             'show_notes' => $check('show_notes'),
             'attach_new_order' => $check('attach_new_order'),

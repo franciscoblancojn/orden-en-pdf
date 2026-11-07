@@ -84,6 +84,20 @@ $site_name = html_entity_decode(get_bloginfo('name'), ENT_QUOTES, 'UTF-8');
         </td>
     </tr>
     <tr>
+        <th scope="row"><label for="oep-document-label">Documento del cliente</label></th>
+        <td>
+            <input type="text" id="oep-document-label" name="oep[document_label]" value="<?= esc_attr($config['document_label']) ?>" class="regular-text" placeholder="Cédula">
+            <p class="description">Etiqueta en la caja de Facturación (p. ej. «Cédula», «Cédula / NIT»). Vacía = solo el número.</p>
+            <p><label for="oep-document-fields">Campos del pedido donde buscarlo (uno por línea)</label></p>
+            <textarea id="oep-document-fields" name="oep[document_fields]" rows="4" class="large-text code"><?= esc_textarea($config['document_fields']) ?></textarea>
+            <p class="description">
+                Metadatos del pedido, en orden. Si el cliente lo escribió en varios campos, se muestran los valores distintos separados por « / ».
+                <code>_billing_id</code>: campo <code>billing_id</code> de facturación · <code>_cedula</code>: campo <code>cedula</code> de algunos plugins de envío.
+                Vacío = no se muestra el documento.
+            </p>
+        </td>
+    </tr>
+    <tr>
         <th scope="row">Contenido</th>
         <td>
             <label>

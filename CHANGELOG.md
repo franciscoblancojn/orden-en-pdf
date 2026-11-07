@@ -4,6 +4,11 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
+## [Sin publicar]
+
+### ✨ Añadido
+- 🪪 **Cédula del cliente en la caja de Facturación** («Cédula: 1234567890»). Se busca en los campos del pedido configurables en la pestaña PDF → «Documento del cliente»; por defecto `_billing_id` / `billing_id` (campo Cédula de facturación) y `_cedula` / `cedula` (campo Cédula que agregan algunos plugins de envío). Si el cliente la escribió en los dos campos con números distintos, salen los dos («111111 / 222222»); si es el mismo número, una sola vez. La etiqueta se puede cambiar (p. ej. «Cédula / NIT») o dejar vacía.
+
 ## [1.0.3] - 2026-11-07
 
 ### 🔄 Cambiado

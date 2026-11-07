@@ -369,6 +369,38 @@ class OEP_ORDER
     }
 
     /**
+     * Documento del cliente (cédula, NIT…) a partir de los metadatos configurados.
+     *
+     * Se revisan todos los campos en orden y se devuelven los valores distintos, unidos con " / ":
+     * el cliente puede haberlo escrito en cualquiera de los campos del checkout (o en los dos).
+     *
+     * @param WC_Order $order
+     * @return array{label: string, value: string}
+     */
+    public static function document($order)
+    {
+        $config = (new OEP_USE_DATA_CONFIG())->get();
+        $values = [];
+        foreach (OEP_USE_DATA_CONFIG::document_fields($config['document_fields']) as $key) {
+            $value = $order->get_meta($key, true);
+            if (!is_scalar($value)) {
+                continue;
+            }
+            $value = self::plain((string) $value);
+            // Misma cédula escrita con puntos o espacios en el otro campo: no repetirla.
+            $norm = preg_replace('/[\s.\-]/', '', $value);
+            if ('' !== $value && !isset($values[$norm])) {
+                $values[$norm] = $value;
+            }
+        }
+
+        return [
+            'label' => self::plain($config['document_label']),
+            'value' => implode(' / ', $values),
+        ];
+    }
+
+    /**
      * Todos los datos que usa la plantilla.
      *
      * @param WC_Order $order
@@ -389,6 +421,7 @@ class OEP_ORDER
             'customer_id' => (int) $order->get_customer_id(),
             'customer_note' => self::plain($order->get_customer_note()),
             'billing' => $billing,
+            'document' => self::document($order),
             'shipping' => $shipping,
             'has_shipping' => (bool) $order->has_shipping_address(),
             'items' => self::items($order),
