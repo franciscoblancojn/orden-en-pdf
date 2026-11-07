@@ -29,6 +29,7 @@ El PDF se genera en el momento: no se guardan copias de los pedidos en el servid
 - Totales de WooCommerce: subtotal, descuento, envío, impuestos, total y devoluciones.
 - Nota del cliente (opcional) e historial de notas del pedido (opcional).
 - Pie de página configurable y numeración «Página X de Y».
+- **Emojis** en la cabecera, la nota del cliente, las notas del pedido y el pie (por ejemplo `🏭`, `📩`, `☎️`). Se dibujan con la fuente incluida `assets/fonts/OEPEmoji.ttf`. DOMPDF solo maneja caracteres del plano básico de Unicode, así que la fuente es una versión de Noto Emoji con los emojis remapeados al área de uso privado (`U+E000` en adelante); la correspondencia está en `src/data/emoji-map.php` y se regenera con `scripts/build-emoji-font.py`. Si la fuente no se puede registrar (uploads sin permiso de escritura), los emojis se omiten para no imprimir glifos rotos.
 
 ## ⚙️ Configuración
 
@@ -103,11 +104,13 @@ orden-en-pdf/
 ├── libs/                     # dompdf/dompdf + franciscoblancojn/wordpress_utils (Composer → libs)
 ├── bin/harness.sh            # Validaciones (npm run check)
 ├── scripts/bump-version.sh   # npm run push-v
+├── scripts/build-emoji-font.py # Regenera OEPEmoji.ttf y el mapa de emojis
+├── assets/fonts/OEPEmoji.ttf # Noto Emoji remapeada al área de uso privado (+ OFL)
 ├── .github/workflows/        # Release con el zip al subir un tag
 └── src/
     ├── _.php                 # Cargador maestro
-    ├── data/                 # OEP_USE_DATA_CONFIG (wp_options) y OEP_LOG_SERVICE
-    ├── services/             # OEP_ORDER (datos), OEP_LOGO (data URI), OEP_PDF (DOMPDF)
+    ├── data/                 # Config, log y emoji-map.php (Unicode → área privada)
+    ├── services/             # OEP_ORDER (datos), OEP_LOGO (data URI), OEP_EMOJI (fuente), OEP_PDF (DOMPDF)
     ├── hooks/                # order (caja en el detalle, HPOS), email (adjunto al admin)
     ├── api/                  # descarga y guardado de ajustes
     ├── templates/            # Plantilla HTML del PDF

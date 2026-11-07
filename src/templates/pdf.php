@@ -36,6 +36,12 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
             line-height: 1.45;
             color: #1f2933;
         }
+        /* Los emojis se escriben en un área privada de OEPEmoji.ttf (ver OEP_EMOJI). */
+        .oep-emoji {
+            font-family: "OEP Emoji";
+            font-weight: normal;
+            font-style: normal;
+        }
         h2 {
             margin: 16px 0 6px;
             font-size: 10.5px;
@@ -254,7 +260,7 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
                     <div class="brand"><?= esc_html($company) ?></div>
                 <?php endif; ?>
                 <?php if ('' !== trim($config['header_text'])) : ?>
-                    <div class="company-data"><?= nl2br(esc_html($config['header_text'])) ?></div>
+                    <div class="company-data"><?= nl2br(OEP_EMOJI::wrap($config['header_text'])) ?></div>
                 <?php endif; ?>
             </td>
             <td class="header-right">
@@ -383,7 +389,7 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
 
     <?php if ($config['show_customer_note'] && '' !== $data['customer_note']) : ?>
         <h2>Nota del cliente</h2>
-        <div class="note"><?= nl2br(esc_html($data['customer_note'])) ?></div>
+        <div class="note"><?= nl2br(OEP_EMOJI::wrap($data['customer_note'])) ?></div>
     <?php endif; ?>
 
     <?php if ($config['show_notes'] && !empty($data['notes'])) : ?>
@@ -393,7 +399,7 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
                 <div class="note__meta">
                     <?= esc_html($note['date']) ?> · <?= $note['customer'] ? 'Visible para el cliente' : 'Nota interna' ?>
                 </div>
-                <div><?= nl2br(esc_html($note['content'])) ?></div>
+                <div><?= nl2br(OEP_EMOJI::wrap($note['content'])) ?></div>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>

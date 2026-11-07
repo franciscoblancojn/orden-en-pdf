@@ -70,7 +70,17 @@ class OEP_PDF
         $options->set('tempDir', get_temp_dir());
         $options->set('chroot', OEP_DIR);
 
+        // DOMPDF escribe aquí la fuente y su caché de métricas. Tiene que ser un
+        // directorio escribible; el de uploads lo es en cualquier WordPress.
+        $font_dir = OEP_EMOJI::font_dir();
+        if ('' !== $font_dir) {
+            $options->set('fontDir', $font_dir);
+            $options->set('fontCache', $font_dir);
+        }
+
         $dompdf = new Dompdf($options);
+        // Antes de armar el HTML: OEP_EMOJI::wrap() necesita saber si la fuente cargó.
+        OEP_EMOJI::register($dompdf);
         $dompdf->loadHtml(self::html($order, $with_logo), 'UTF-8');
         $dompdf->setPaper('letter' === $config['paper'] ? 'letter' : 'a4', 'portrait');
         $dompdf->render();
@@ -247,13 +257,78 @@ class OEP_PDF
         if ('' !== $left) {
             // Deja 12 px de separación con el número de página; si no cabe, se recorta.
             $max = $page_x - $margin - 12;
-            $left = self::fit($left, $font, $size, $max, $metrics);
-            if ('' !== $left) {
-                $canvas->page_text($margin, $y, $left, $font, $size, $color);
+            $segments = self::fit_segments(OEP_EMOJI::segments($left), $max, $metrics, $size, $font);
+            $x = $margin;
+            foreach ($segments as $segment) {
+                $segment_font = $font;
+                if ($segment['emoji']) {
+                    $emoji_font = $metrics->getFont(OEP_EMOJI::FAMILY, 'normal');
+                    if (!$emoji_font) {
+                        continue;
+                    }
+                    $segment_font = $emoji_font;
+                }
+                if ('' === $segment['text']) {
+                    continue;
+                }
+                $canvas->page_text($x, $y, $segment['text'], $segment_font, $size, $color);
+                $x += $metrics->getTextWidth($segment['text'], $segment_font, $size);
             }
         }
 
         $canvas->page_text($page_x, $y, $page, $font, $size, $color);
+    }
+
+    /**
+     * Ajusta los segmentos del pie (texto y emojis) al ancho disponible.
+     *
+     * @param array  $segments
+     * @param float  $max
+     * @param mixed  $metrics
+     * @param float  $size
+     * @param mixed  $font
+     * @return array
+     */
+    private static function fit_segments($segments, $max, $metrics, $size, $font)
+    {
+        $out = [];
+        $used = 0;
+
+        foreach ($segments as $segment) {
+            $segment_font = $font;
+            if ($segment['emoji']) {
+                $emoji_font = $metrics->getFont(OEP_EMOJI::FAMILY, 'normal');
+                if (!$emoji_font) {
+                    continue;
+                }
+                $segment_font = $emoji_font;
+            }
+
+            $remaining = $max - $used;
+            if ($remaining <= 0) {
+                break;
+            }
+
+            $width = $metrics->getTextWidth($segment['text'], $segment_font, $size);
+            if ($width <= $remaining) {
+                $out[] = $segment;
+                $used += $width;
+                continue;
+            }
+
+            // No se parte un emoji: se corta el pie antes de él.
+            if ($segment['emoji']) {
+                break;
+            }
+
+            $fit = self::fit($segment['text'], $segment_font, $size, $remaining, $metrics);
+            if ('' !== $fit) {
+                $out[] = ['text' => $fit, 'emoji' => false];
+            }
+            break;
+        }
+
+        return $out;
     }
 
     /**
