@@ -4,7 +4,7 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
-## [Sin publicar]
+## [1.0.3] - 2026-11-07
 
 ### 🔄 Cambiado
 - 🗺️ En **Facturación** y **Envío** el departamento sale con su nombre y no con el código (ANT → Antioquia), usando la lista de estados de WooCommerce (incluye los que agregan otros plugins). Si el código no está en la lista, se muestra tal cual. La ciudad y el departamento van separados por coma: «Medellín, Antioquia 050001».

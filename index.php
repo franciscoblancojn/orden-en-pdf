@@ -3,7 +3,7 @@
 Plugin Name: Orden en PDF
 Plugin URI: https://github.com/franciscoblancojn/orden-en-pdf
 Description: Descarga el pedido en PDF desde el detalle del pedido y lo adjunta a los correos del administrador (nuevo, cancelado y fallido). El PDF carga el logo del sitio, los datos del cliente, los productos, los totales y las notas.
-Version: 1.0.2
+Version: 1.0.3
 Author: franciscoblancojn
 Author URI: https://franciscoblanco.vercel.app/
 License: GPL2+
