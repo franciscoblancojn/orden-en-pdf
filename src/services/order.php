@@ -125,6 +125,43 @@ class OEP_ORDER
     }
 
     /**
+     * Nombre del departamento / estado a partir del código guardado en el pedido (ANT → Antioquia).
+     *
+     * Usa la lista de WooCommerce (WC()->countries->get_states()), que incluye los estados que
+     * agregan otros plugins con el filtro woocommerce_states. WooCommerce guarda los de Colombia
+     * como "CO-ANT"; algunos plugins usan "ANT": se prueban las dos formas. Si no se encuentra,
+     * se devuelve el texto tal cual (pedidos con el departamento escrito a mano).
+     *
+     * @param string $country_code
+     * @param string $state
+     */
+    public static function state_name($country_code, $state)
+    {
+        $state = self::plain($state);
+        if ('' === $state || '' === $country_code || !function_exists('WC') || !WC() || empty(WC()->countries)) {
+            return $state;
+        }
+        $states = WC()->countries->get_states($country_code);
+        if (!is_array($states) || !$states) {
+            return $state;
+        }
+        $prefix = $country_code . '-';
+        $candidates = [$state, strtoupper($state)];
+        if (0 === stripos($state, $prefix)) {
+            $candidates[] = strtoupper(substr($state, strlen($prefix)));
+        } else {
+            $candidates[] = $prefix . strtoupper($state);
+        }
+        foreach ($candidates as $key) {
+            if (isset($states[$key]) && '' !== (string) $states[$key]) {
+                return self::plain($states[$key]);
+            }
+        }
+
+        return $state;
+    }
+
+    /**
      * Dirección de facturación o de envío.
      *
      * @param WC_Order $order
@@ -144,6 +181,7 @@ class OEP_ORDER
             $countries = WC()->countries->get_countries();
         }
         $country = isset($countries[$country_code]) ? $countries[$country_code] : $country_code;
+        $state = self::state_name($country_code, $get('state'));
 
         $lines = [];
         $company = self::plain($get('company'));
@@ -154,11 +192,11 @@ class OEP_ORDER
         if ('' !== $address) {
             $lines[] = $address;
         }
-        $city = trim(implode(' ', array_filter([
+        // "Ciudad, Departamento Código postal" (p. ej. "Medellín, Antioquia 050001").
+        $city = trim(implode(', ', array_filter([
             self::plain($get('city')),
-            self::plain($get('state')),
-            self::plain($get('postcode')),
-        ])));
+            $state,
+        ])) . ' ' . self::plain($get('postcode')));
         if ('' !== $city) {
             $lines[] = $city;
         }
