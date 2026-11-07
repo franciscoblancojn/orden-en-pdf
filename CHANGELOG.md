@@ -4,6 +4,11 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
+## [1.0.5] - 2026-11-07
+
+### 🐛 Corregido
+- 🪪 La **cédula** no salía en el PDF cuando la guardó un plugin que todavía usa `update_post_meta()` (por ejemplo, el campo «Cédula» de algunos plugins de envío). Con las tablas de pedidos de WooCommerce (HPOS) esos datos no están en los metadatos del pedido sino en los de su entrada: ahora, si el pedido no tiene el campo, se busca también ahí. Nuevo filtro `oep_order_meta` para resolver campos guardados en otro lugar.
+
 ## [1.0.4] - 2026-11-07
 
 ### ✨ Añadido

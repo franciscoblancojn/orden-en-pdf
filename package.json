@@ -1,6 +1,6 @@
 {
   "name": "orden-en-pdf",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "description": "Plugin de WordPress: descarga el pedido en PDF desde el detalle del pedido y lo adjunta a los correos del administrador.",
   "scripts": {

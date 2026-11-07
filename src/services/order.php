@@ -369,6 +369,34 @@ class OEP_ORDER
     }
 
     /**
+     * Metadato del pedido, también si otro plugin lo guardó a la manera antigua.
+     *
+     * Con HPOS (tablas de pedidos de WooCommerce) $order->get_meta() solo lee la tabla de
+     * metadatos de pedidos. Hay plugins que siguen guardando con update_post_meta() en la
+     * entrada del pedido (wp_postmeta): si el pedido no lo tiene, se busca ahí.
+     *
+     * @param WC_Order $order
+     * @param string   $key
+     * @return mixed
+     */
+    public static function meta($order, $key)
+    {
+        $value = $order->get_meta($key, true);
+        if (('' === $value || null === $value || false === $value) && $order->get_id()) {
+            $value = get_post_meta($order->get_id(), $key, true);
+        }
+
+        /**
+         * Permite resolver un campo guardado en otro lugar (p. ej. una opción de otro plugin).
+         *
+         * @param mixed    $value
+         * @param string   $key
+         * @param WC_Order $order
+         */
+        return apply_filters('oep_order_meta', $value, $key, $order);
+    }
+
+    /**
      * Documento del cliente (cédula, NIT…) a partir de los metadatos configurados.
      *
      * Se revisan todos los campos en orden y se devuelven los valores distintos, unidos con " / ":
@@ -382,7 +410,7 @@ class OEP_ORDER
         $config = (new OEP_USE_DATA_CONFIG())->get();
         $values = [];
         foreach (OEP_USE_DATA_CONFIG::document_fields($config['document_fields']) as $key) {
-            $value = $order->get_meta($key, true);
+            $value = self::meta($order, $key);
             if (!is_scalar($value)) {
                 continue;
             }

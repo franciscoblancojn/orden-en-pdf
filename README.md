@@ -2,7 +2,7 @@
 
 > Plugin de WordPress para WooCommerce: **descarga el pedido en PDF** desde el detalle del pedido en el admin y **adjunta ese PDF a los correos que recibe el administrador**. El documento carga el logo del sitio, los datos del cliente, los productos, los totales y las notas.
 
-**Versión:** 1.0.4 · **WordPress:** 5.8+ · **PHP:** 7.4+ · **WooCommerce:** requerido · **Licencia:** GPLv2+
+**Versión:** 1.0.5 · **WordPress:** 5.8+ · **PHP:** 7.4+ · **WooCommerce:** requerido · **Licencia:** GPLv2+
 
 📋 [Registro de cambios](CHANGELOG.md) · 🤖 [Reglas para IAs](AGENTS.md) · 📦 [Releases](https://github.com/franciscoblancojn/orden-en-pdf/releases)
 
