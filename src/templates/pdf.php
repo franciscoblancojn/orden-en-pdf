@@ -114,9 +114,10 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
             vertical-align: top;
         }
         .box {
-            padding: 8px 10px;
-            background: #f5f7fa;
-            border-left: 3px solid <?= esc_attr($accent) ?>;
+            padding: 0;
+            background: none;
+            border: 0;
+            vertical-align: top;
             page-break-inside: avoid;
         }
         .box__title {
@@ -187,6 +188,23 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
         }
         .item-name {
             font-weight: bold;
+        }
+        .item-row {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .item-row td {
+            padding: 0;
+            border: 0;
+            vertical-align: top;
+        }
+        .item-row td.item-pic {
+            width: 38px;
+            padding-right: 6px;
+        }
+        .item-pic img {
+            width: 32px;
+            height: 32px;
         }
         .item-meta {
             margin-top: 2px;
@@ -354,9 +372,23 @@ $title = trim($config['document_title']) !== '' ? $config['document_title'] : 'P
                     <tr>
                         <td class="num"><?= (int) $index + 1 ?></td>
                         <td>
-                            <span class="item-name"><?= esc_html($item['name']) ?></span>
-                            <?php if (!empty($item['meta'])) : ?>
-                                <div class="item-meta"><?= esc_html(implode(' · ', $item['meta'])) ?></div>
+                            <?php if (!empty($item['image'])) : ?>
+                                <table class="item-row">
+                                    <tr>
+                                        <td class="item-pic"><img src="<?= esc_attr($item['image']) ?>" alt=""></td>
+                                        <td>
+                                            <span class="item-name"><?= esc_html($item['name']) ?></span>
+                                            <?php if (!empty($item['meta'])) : ?>
+                                                <div class="item-meta"><?= esc_html(implode(' · ', $item['meta'])) ?></div>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <?php else : ?>
+                                <span class="item-name"><?= esc_html($item['name']) ?></span>
+                                <?php if (!empty($item['meta'])) : ?>
+                                    <div class="item-meta"><?= esc_html(implode(' · ', $item['meta'])) ?></div>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                         <td><?= esc_html($item['sku']) ?></td>

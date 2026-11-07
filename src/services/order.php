@@ -198,9 +198,11 @@ class OEP_ORDER
             }
 
             $sku = '';
+            $image = '';
             $product = $item->get_product();
             if ($product) {
                 $sku = (string) $product->get_sku();
+                $image = self::item_image($product);
             }
 
             $items[] = [
@@ -210,10 +212,67 @@ class OEP_ORDER
                 'unit' => self::money($unit, $order),
                 'total' => self::money($subtotal, $order),
                 'meta' => $meta,
+                'image' => $image,
             ];
         }
 
         return $items;
+    }
+
+    /**
+     * Miniatura del producto o, si es una variación, la suya propia.
+     *
+     * @param WC_Product $product
+     * @return string data URI, o '' si no hay imagen.
+     */
+    private static function item_image($product)
+    {
+        $image_id = 0;
+        if ($product->is_type('variation')) {
+            // `get_image_id()` de la variación puede devolver la del padre; se
+            // prefiere la miniatura propia si existe.
+            $image_id = (int) get_post_thumbnail_id($product->get_id());
+        }
+        if (!$image_id) {
+            $image_id = (int) $product->get_image_id();
+        }
+        if (!$image_id) {
+            return '';
+        }
+
+        $path = self::image_path($image_id);
+        if ('' === $path) {
+            return '';
+        }
+
+        return OEP_IMAGE::data_uri($path, 120);
+    }
+
+    /**
+     * Archivo de la miniatura de WooCommerce (100 × 100) o, si no existe, la
+     * imagen original.
+     *
+     * @param int $image_id
+     * @return string
+     */
+    private static function image_path($image_id)
+    {
+        $path = (string) get_attached_file($image_id);
+        if ('' === $path || !is_file($path)) {
+            return '';
+        }
+
+        $meta = wp_get_attachment_metadata($image_id);
+        foreach (['woocommerce_gallery_thumbnail', 'thumbnail'] as $size) {
+            if (!empty($meta['sizes'][$size]['file'])) {
+                $candidate = trailingslashit(dirname($path)) . $meta['sizes'][$size]['file'];
+                if (is_file($candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $path;
     }
 
     /**

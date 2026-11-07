@@ -2,7 +2,7 @@
 
 > Plugin de WordPress para WooCommerce: **descarga el pedido en PDF** desde el detalle del pedido en el admin y **adjunta ese PDF a los correos que recibe el administrador**. El documento carga el logo del sitio, los datos del cliente, los productos, los totales y las notas.
 
-**Versión:** 1.0.1 · **WordPress:** 5.8+ · **PHP:** 7.4+ · **WooCommerce:** requerido · **Licencia:** GPLv2+
+**Versión:** 1.0.2 · **WordPress:** 5.8+ · **PHP:** 7.4+ · **WooCommerce:** requerido · **Licencia:** GPLv2+
 
 📋 [Registro de cambios](CHANGELOG.md) · 🤖 [Reglas para IAs](AGENTS.md) · 📦 [Releases](https://github.com/franciscoblancojn/orden-en-pdf/releases)
 
@@ -25,7 +25,7 @@ El PDF se genera en el momento: no se guardan copias de los pedidos en el servid
 - Logo del sitio (o el logo elegido en los ajustes) y datos de cabecera.
 - Número, fecha, estado, método de pago, transacción y método de envío.
 - Cliente y direcciones de facturación y envío (email y teléfono en facturación).
-- Productos: nombre, SKU, variaciones, cantidad, precio unitario y total.
+- Productos: miniatura del producto o de la variación, nombre, SKU, variaciones, cantidad, precio unitario y total.
 - Totales de WooCommerce: subtotal, descuento, envío, impuestos, total y devoluciones.
 - Nota del cliente (opcional) e historial de notas del pedido (opcional).
 - Pie de página configurable y numeración «Página X de Y».
@@ -110,7 +110,7 @@ orden-en-pdf/
 └── src/
     ├── _.php                 # Cargador maestro
     ├── data/                 # Config, log y emoji-map.php (Unicode → área privada)
-    ├── services/             # OEP_ORDER (datos), OEP_LOGO (data URI), OEP_EMOJI (fuente), OEP_PDF (DOMPDF)
+    ├── services/             # OEP_ORDER (datos), OEP_LOGO / OEP_IMAGE (data URI), OEP_EMOJI (fuente), OEP_PDF (DOMPDF)
     ├── hooks/                # order (caja en el detalle, HPOS), email (adjunto al admin)
     ├── api/                  # descarga y guardado de ajustes
     ├── templates/            # Plantilla HTML del PDF

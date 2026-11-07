@@ -4,6 +4,14 @@ Todos los cambios importantes del plugin Orden en PDF. Formato basado en [Keep a
 
 > ✍️ Antes de publicar, agrega arriba una sección `## [Sin publicar]` con los cambios. `npm run push-v -- patch|minor|major` la renombra a `## [X.Y.Z] - fecha`, y no publica si esa sección no existe.
 
+## [1.0.2] - 2026-11-06
+
+### ✨ Añadido
+- 🖼️ **Miniatura en la tabla de productos**: cada línea muestra la imagen del producto o, si es una variación, la suya propia (o la del padre si la variación no tiene). Se usa la miniatura de WooCommerce en un tamaño reducido y se incrusta como data URI, así que el PDF no depende de internet.
+
+### 🔄 Cambiado
+- 🧾 **Facturación y envío**: las dos cajas ya no llevan fondo gris ni borde izquierdo; el contenido queda alineado arriba y a la izquierda.
+
 ## [1.0.1] - 2026-11-06
 
 ### 🐛 Corregido
